@@ -7,10 +7,3 @@ def save_logs_on_system(login_data):
 
     with open("user_login.file","w") as f:
         f.write(str(login_data))
-
-
-
-
-
-
-

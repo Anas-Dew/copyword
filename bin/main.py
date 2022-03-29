@@ -35,7 +35,7 @@ def read_existing_login_from_local():
 
         print(f"\nWelcome, {userbase.find_one({'email' : f'{email}'})['name']}")
 
-        keeping_the_server_updated()
+        
 
     except:
 
@@ -168,6 +168,7 @@ if __name__ == "__main__" :
 
     # create_my_account()
     # user_login()
+    keeping_the_server_updated()
     
 
 
