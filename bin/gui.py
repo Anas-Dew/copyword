@@ -2,13 +2,15 @@ from time import sleep
 from tkinter import Button, Label, Tk, Entry
 import ast
 import os
+from typing import Optional
 
 os.chdir(f"{os.getcwd()}\\copyword\\bin")
 existed_account_schema = ""
 
 root = Tk()
 
-root.geometry("350x200")
+# root.geometry("350x200")
+root.geometry("350x500")
 root.title("CopyWord")
 root.configure(background='#1e1e21')
 root.resizable('False','False')
@@ -40,62 +42,69 @@ def connection_status():
     except:
         status_bar['text'] = "You're logged out !!!"
         status_bar['bg'] = "#70030a"
-        # login_or_signup_screen("LOGIN")
-        
-        
+        login_or_signup_screen("LOGIN")
+
+# ------------------------------------------------------------------------------------------------------------------
 
 
-def login_or_signup_screen(auth_method:str):
+logout_button = Button(root, text="Logout", width=25, height=1,command=lambda: login_or_signup_screen("LOGIN"), activeforeground="white", activebackground="#383838")
+I_dont_have_account = Button(root, text="I don't have account", width=25, height=1,command=lambda: login_or_signup_screen("SIGNUP"), activeforeground="white", activebackground="#383838")
+    
+login = Button(root, text="Login", width=25, height=1,command=None, activeforeground="white", activebackground="#383838")
+signup = Button(root, text="Create New Account", width=25, height=1,command=None, activeforeground="white", activebackground="#383838")
+back_to_previous_menu = Button(root, text="Back", width=25, height=1, activeforeground="white", activebackground="#383838")
+
+# ---------------------
+signed_as_user_name_shown_on_screen = Label(root,text=f"Welcome, Anas",bg="#1e1e21",fg="White",font="sans 14")
+# ---------------------
+user_name = Entry(root, width=30, bg="#383838", fg="White")
+email = Entry(root, width=30, bg="#383838", fg="White")
+password = Entry(root, width=30, bg="#383838", fg="White")
+# -------------------------------------------------------------------------------------------------------------------
+def login_or_signup_screen(auth_method:str, name:Optional[str] = None):
     global existed_account_schema
-    
-    email = Entry(root, width=30, bg="#383838", fg="White")
-    name = Entry(root, width=30, bg="#383838", fg="White")
-    password = Entry(root, width=30, bg="#383838", fg="White")
-
-    signed_as = Label(root,text=f"Welcome, Anas",bg="#1e1e21",fg="White",font="sans 14")
-    logout = Button(root, text="Logout", width=25, height=1,command=lambda: login_or_signup_screen("LOGIN"), activeforeground="white", activebackground="#383838")
-    
-    I_dont_have_account = Button(root, text="I don't have account", width=25, height=1,command=lambda: login_or_signup_screen("SIGNUP"), activeforeground="white", activebackground="#383838")
-    
-    login = Button(root, text="Login", width=25, height=1,command=None, activeforeground="white", activebackground="#383838")
-        
+            
 
     if auth_method == "LOGIN" :
 
+        signed_as_user_name_shown_on_screen.pack_forget()
+        logout_button.pack_forget()
 
-        # email.pack(pady=3)
-        # password.pack(pady=3)
+        email.pack(pady=3)
+        email.insert(0, 'Email')
         
-        # login.pack(padx=2, pady=7)
-                
-        I_dont_have_account.pack(pady=0)
+        password.pack(pady=3)
+        password.insert(0, 'Password')
 
-        logout.pack_forget()
-        signed_as.pack_forget()
+        login.pack(padx=2, pady=7)
+
+        I_dont_have_account.pack()
+
 
 
     elif auth_method == "SIGNUP" :
-        email.pack_forget()
-        password.pack_forget()
-        Login.pack_forget()
+        
+        # email.pack_forget()
+        # password.pack_forget()
+        login.pack_forget()
         I_dont_have_account.pack_forget()
 
-        name = Entry(root, width=30, bg="#383838", fg="White")
-        name.pack(pady=3)
-        
-        email = Entry(root, width=30, bg="#383838", fg="White")
-        email.pack(pady=3)
+        user_name.pack(pady=3)
+        user_name.insert(0, 'Name')
 
-        password = Entry(root, width=30, bg="#383838", fg="White")
-        password.pack(pady=3)
+        # email.pack(pady=3)
+        # email.insert(0, 'Email')
         
-        Login = Button(root, text="Login", width=25, height=1,command=None, activeforeground="white", activebackground="#383838").pack(padx=2, pady=14)
+        # password.pack(pady=3)
+        # password.insert(0, 'Password')
+
+        signup.pack(padx=2, pady=7)
+        # back_to_previous_menu.pack()
     
     elif auth_method == "LOGOUT" :
         
-        signed_as.pack(pady=10)
-
-        logout.pack(padx=2, pady=7)
+        signed_as_user_name_shown_on_screen.pack(pady=10)
+        logout_button.pack(padx=2, pady=7)
 
     else:
         connection_status()
