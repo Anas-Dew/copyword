@@ -5,10 +5,10 @@ import os
 import pymongo
 from verification_client import save_logs_on_system
 import pyperclip as pc
-
+import re
 os.chdir(f"{os.getcwd()}\\copyword\\bin")
 
-DBClient = pymongo.MongoClient("mongodb://localhost:27017")
+# DBClient = pymongo.MongoClient("mongodb://localhost:27017")
 
 DB = DBClient['copyword']
 userbase = DB['userbase']
@@ -18,7 +18,6 @@ existed_account_schema = ""
 root = Tk()
 
 root.geometry("350x260")
-# root.geometry("350x500")
 root.title("CopyWord")
 root.configure(background='#1e1e21')
 root.resizable('False','False')
@@ -29,12 +28,14 @@ status_bar = Label(text="Anas-Dew", bg="Black", fg="White", font="sans 9")
 status_bar.pack(side="bottom",fill="x")
 
 
+
 # --------------------------------------------------------------------------------------
 def read_existing_login_from_local():
     status_bar['text'] = "Loading..."
-
+    
     global existed_account_schema
     try:
+        
         file = open('user_login.file','r')
 
         login_values_in_raw_format = file.readline()
@@ -48,29 +49,30 @@ def read_existing_login_from_local():
 
         existed_account_schema = read_account_schema
         
+        
         status_bar['text'] = "Login Succees"
         status_bar['bg'] = "#03700c"
         
         keeping_the_server_updated()
-        login_or_signup_screen("LOGOUT")
+        app_screens("LOGOUT")
 
     except:
         status_bar['text'] = "You're logged out !!!"
         status_bar['bg'] = "#70030a"
-        login_or_signup_screen("LOGIN")
+        app_screens("LOGIN")
 
 # ------------------------------------------------------------------------------------------------------------------
 
 
-logout_button = Button(root, text="Logout", width=25, height=1,command=lambda: login_or_signup_screen("LOGIN"), activeforeground="white", activebackground="#383838")
-I_dont_have_account = Button(root, text="I don't have account", width=25, height=1,command=lambda: login_or_signup_screen("SIGNUP"), activeforeground="white", activebackground="#383838")
+logout_button = Button(root, text="Logout", width=25, height=1,command=lambda: app_screens("LOGIN"), activeforeground="white", activebackground="#383838")
+I_dont_have_account = Button(root, text="I don't have account", width=25, height=1,command=lambda: app_screens("SIGNUP"), activeforeground="white", activebackground="#383838")
     
 login = Button(root, text="Login", width=25, height=1,command=lambda: user_login(), activeforeground="white", activebackground="#383838")
 signup = Button(root, text="Create New Account", width=25, height=1,command=lambda: create_my_account(), activeforeground="white", activebackground="#383838")
-back_to_previous_menu = Button(root,command=lambda: login_or_signup_screen("LOGIN"), text="Back", width=25, height=1, activeforeground="white", activebackground="#383838")
+back_to_previous_menu = Button(root,command=lambda: app_screens("LOGIN"), text="Back", width=25, height=1, activeforeground="white", activebackground="#383838")
 
 # ---------------------
-signed_as_user_name_shown_on_screen = Label(root,text=f"Welcome back",bg="#1e1e21",fg="White",font="sans 14")
+signed_as_user_name_shown_on_screen = Label(root,text=f'Welcome back',bg="#1e1e21",fg="White",font="sans 14")
 # ---------------------
 
 user_name = Entry(root, width=30, bg="#383838", fg="White")
@@ -84,22 +86,22 @@ password.insert(0, 'Password')
 
 # -------------------------------------------------------------------------------------------------------------------
 
+
 def user_login():
     global existed_account_schema
     try:
 
         existed_account_schema = {
-            "email" : email.get(),
-            "name" : {userbase.find_one({'email' : f'{email.get()}'})['name']},
-            "password" : password.get()
-        }
+                "email" : email.get(),
+                "name" : {userbase.find_one({'email' : f'{email.get()}'})['name']},
+                "password" : password.get()
+            }
 
         save_logs_on_system(existed_account_schema)
         keeping_the_server_updated()
-        login_or_signup_screen("LOGOUT")
+        app_screens("LOGOUT")
 
     except:
-
         pass
 
 
@@ -114,28 +116,26 @@ def create_my_account():
         }
 
         existed_account_schema = new_account_schema
-        print(new_account_schema)
-        userbase.insert_one(new_account_schema)
+        
+        userbase.insert_one(existed_account_schema)
         save_logs_on_system(existed_account_schema)
         keeping_the_server_updated()
 
-        login_or_signup_screen("LOGOUT")
+        app_screens("LOGOUT")
     
     except:
         pass
 
+# -----------------------------------------------------------------------------------
 
-
-
-# name:Optional[str] = None
-def login_or_signup_screen(auth_method:str):
+def app_screens(auth_method:str):
 
     global existed_account_schema
             
 
     if auth_method == "LOGIN" :
 
-        root.after_cancel(keeping_the_server_updated)
+        # DBClient.close()
         status_bar['text'] = "You're logged out !!!"
         status_bar['bg'] = "#70030a"
 
@@ -165,7 +165,7 @@ def login_or_signup_screen(auth_method:str):
         back_to_previous_menu.pack()
 
     elif auth_method == "LOGOUT" :
-
+        
         email.pack_forget()
         password.pack_forget()        
 
@@ -182,7 +182,12 @@ def login_or_signup_screen(auth_method:str):
         status_bar['text'] = "Login Succees"
         status_bar['bg'] = "#03700c"
 
-        
+    elif auth_method == "ERROR" :
+
+        signed_as_user_name_shown_on_screen['text'] == 'Invalid Email'
+        status_bar['text'] = "You're logged out !!!"
+        status_bar['bg'] = "#70030a"
+
 
     else:
         read_existing_login_from_local()
