@@ -5,7 +5,7 @@ import os
 import pymongo
 from verification_client import save_logs_on_system
 import pyperclip as pc
-import re
+
 
 # -------------------------------------some-importrant-variables-and-bases-to-run-application
 os.chdir(f"{os.getcwd()}\\copyword\\bin")
@@ -74,7 +74,7 @@ back_to_previous_menu = Button(root,command=lambda: app_screens("LOGIN"), text="
 
 # ---------------------
 signed_as_user_name_shown_on_screen = Label(root,text=f'Welcome back',bg="#1e1e21",fg="White",font="sans 14")
-
+inner_notification_bar = Label(text="Account Already Exists!", bg="Black", fg="White", font="sans 9")
 # ---------------------
 
 user_name = Entry(root, width=30, bg="#383838", fg="White")
@@ -124,20 +124,27 @@ def create_my_account():
             "password" : password.get()
         }
 
-        if userbase.find_one({"email" : f"{new_account_schema['email']}"}) :
-            print("Account Exist")
-            inner_notification_bar = Label(text="Account Already Exists!", bg="Black", fg="White", font="sans 9")
-            inner_notification_bar.pack(side="bottom",fill="x")
+        if userbase.find_one({"email" : f"{new_account_schema['email']}"}) : #------account-already-found-error
+            if inner_notification_bar.pack(side="bottom",fill="x"):
+                pass
+            else:
+                inner_notification_bar.pack(side="bottom",fill="x")
+                inner_notification_bar.after(7000,inner_notification_bar.destroy)
 
-        else:
+        else: #if-account-available-then-create-on-server-and-run-server
 
-            existed_account_schema = new_account_schema
-            
-            userbase.insert_one(existed_account_schema)
-            save_logs_on_system(existed_account_schema)
-            keeping_the_server_updated()
+            if password.get() != "" or "Password" :
 
-            app_screens("LOGOUT")
+                existed_account_schema = new_account_schema
+                userbase.insert_one(existed_account_schema)
+                save_logs_on_system(existed_account_schema)
+                keeping_the_server_updated()
+
+                app_screens("LOGOUT")
+
+            else:
+                app_screens("NEW_AC_ERROR")
+
     
     except:
         pass
@@ -153,7 +160,7 @@ def app_screens(auth_method:str):
     global existed_account_schema
             
 
-    if auth_method == "LOGIN" :
+    if auth_method == "LOGIN" : #---------login-screen
 
         status_bar['text'] = "You're logged out !!!"
         status_bar['bg'] = "#70030a"
@@ -172,7 +179,7 @@ def app_screens(auth_method:str):
         I_dont_have_account.pack()
         
 
-    elif auth_method == "SIGNUP" :
+    elif auth_method == "SIGNUP" : #---------sign-up-screen
 
         login.pack_forget()
         I_dont_have_account.pack_forget()
@@ -183,7 +190,7 @@ def app_screens(auth_method:str):
         signup.pack(padx=2, pady=7)
         back_to_previous_menu.pack()
 
-    elif auth_method == "LOGOUT" :
+    elif auth_method == "LOGOUT" : #---------screen-after-account-has-logged-in
     
         email.pack_forget()
         password.pack_forget()        
@@ -203,7 +210,7 @@ def app_screens(auth_method:str):
         signed_as_user_name_shown_on_screen['text'] = f'Welcome, {(list(existed_account_schema["name"]))[0]}'
         signed_as_user_name_shown_on_screen['fg'] = 'white'
 
-    elif auth_method == "ERROR" :
+    elif auth_method == "ERROR" : #---------screen-if-there-is-any-issue
 
         login.pack_forget()
         email.pack_forget()
@@ -218,42 +225,37 @@ def app_screens(auth_method:str):
         status_bar['bg'] = "#70030a"
 
         back_to_previous_menu.pack()
-
+    
+    elif auth_method == "NEW_AC_ERROR" :
+        inner_notification_bar.pack(side="bottom",fill="x")
+        inner_notification_bar['text'] = "Password cannot be empty !"
+        inner_notification_bar.after(5000,inner_notification_bar.destroy)
     else:
         read_existing_login_from_local()
 
 # --------------------------------------------------------------mongodb-server-functions
-def create_and_update_new_word_instance_on_server():
+def create_and_update_new_word_instance_on_server(): #----main-server-driver
 
     new_copied_object = {"clipboard" : f"{pc.paste()}"}
 
-    # if existed_account_schema['password'] == userbase.find_one(login_creds)['password'] :
-
     userbase.find_one_and_update({"email" : existed_account_schema["email"]},{"$set" : new_copied_object})
     reading_new_clipboard_from_server()
-    # else:
-
-    #     app_screens("ERROR")
+   
     
-
-    
-def reading_new_clipboard_from_server():
+def reading_new_clipboard_from_server(): #----reading-letest-value-from-server-if-it-comes-from-another-linked-device
 
     new_clipboard_object = userbase.find_one({"email" : existed_account_schema["email"]})['clipboard']
     pc.copy(new_clipboard_object)
 
-def keeping_the_server_updated():
+def keeping_the_server_updated(): #----keeping-the-loop-running-so-that-values-got-updated-in-secs
     
-        create_and_update_new_word_instance_on_server()
-        # reading_new_clipboard_from_server()
-    
+        create_and_update_new_word_instance_on_server()    
         root.after(1234,keeping_the_server_updated) #1234-is-in-mili-seconds
-
 
 # -------------------------main-function
 
 
 if __name__ == "__main__":
     read_existing_login_from_local()
-    # keeping_the_server_updated()
+
     root.mainloop()
