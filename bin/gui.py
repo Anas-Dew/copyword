@@ -3,7 +3,7 @@ from tkinter import Button, Label, Tk, Entry
 import ast
 import os
 import pymongo
-from verification_client import save_logs_on_system
+from verification_client import save_logs_on_system, email_is_valid, connection_status_on_machine
 import pyperclip as pc
 
 
@@ -36,26 +36,34 @@ def read_existing_login_from_local():
     
     global existed_account_schema
     try:
-        
-        file = open('user_login.file','r')
+        if connection_status_on_machine() == True :
 
-        login_values_in_raw_format = file.readline()
-        login_values_in_dictionary = ast.literal_eval(login_values_in_raw_format)
+            file = open('user_login.file','r')
+
+            login_values_in_raw_format = file.readline()
+            login_values_in_dictionary = ast.literal_eval(login_values_in_raw_format)
+                
+            read_account_schema = {
+                    "email" : login_values_in_dictionary['email'],
+                    "name" : login_values_in_dictionary['name'],
+                    "password" : login_values_in_dictionary['password']
+            }
+
+            existed_account_schema = read_account_schema
             
-        read_account_schema = {
-                "email" : login_values_in_dictionary['email'],
-                "name" : login_values_in_dictionary['name'],
-                "password" : login_values_in_dictionary['password']
-        }
-
-        existed_account_schema = read_account_schema
+            
+            status_bar['text'] = "Login Succees"
+            status_bar['bg'] = "#03700c"
+            
+            keeping_the_server_updated()
+            app_screens("LOGOUT")
         
-        
-        status_bar['text'] = "Login Succees"
-        status_bar['bg'] = "#03700c"
-        
-        keeping_the_server_updated()
-        app_screens("LOGOUT")
+        else :
+            # signed_as_user_name_shown_on_screen.pack()
+            # signed_as_user_name_shown_on_screen['text'] = ':('
+            
+            status_bar['text'] = "No internet connection !"
+            status_bar['bg'] = "#70030a"
 
     except:
         status_bar['text'] = "You're logged out !!!"
@@ -74,7 +82,7 @@ back_to_previous_menu = Button(root,command=lambda: app_screens("LOGIN"), text="
 
 # ---------------------
 signed_as_user_name_shown_on_screen = Label(root,text=f'Welcome back',bg="#1e1e21",fg="White",font="sans 14")
-inner_notification_bar = Label(text="Account Already Exists!", bg="Black", fg="White", font="sans 9")
+inner_notification_bar = Label(text="Anas-Dew", bg="Black", fg="White", font="sans 9")
 # ---------------------
 
 user_name = Entry(root, width=30, bg="#383838", fg="White")
@@ -101,7 +109,7 @@ def user_login():
             }
 
         if password.get() == userbase.find_one(login_creds)['password'] :
-
+            
             save_logs_on_system(existed_account_schema)
             keeping_the_server_updated()
             app_screens("LOGOUT")
@@ -124,26 +132,18 @@ def create_my_account():
             "password" : password.get()
         }
 
-        if userbase.find_one({"email" : f"{new_account_schema['email']}"}) : #------account-already-found-error
-            if inner_notification_bar.pack(side="bottom",fill="x"):
-                pass
-            else:
-                inner_notification_bar.pack(side="bottom",fill="x")
-                inner_notification_bar.after(7000,inner_notification_bar.destroy)
+        if userbase.find_one({"email" : f"{new_account_schema['email']}"}) or email_is_valid(email.get()) == False : #------account-already-found-error
+            # or password.get() == "" or "Password"
+            app_screens("NEW_AC_ERROR")
 
-        else: #if-account-available-then-create-on-server-and-run-server
-
-            if password.get() != "" or "Password" :
-
+        else:
                 existed_account_schema = new_account_schema
+                
                 userbase.insert_one(existed_account_schema)
                 save_logs_on_system(existed_account_schema)
                 keeping_the_server_updated()
-
+                
                 app_screens("LOGOUT")
-
-            else:
-                app_screens("NEW_AC_ERROR")
 
     
     except:
@@ -165,6 +165,7 @@ def app_screens(auth_method:str):
         status_bar['text'] = "You're logged out !!!"
         status_bar['bg'] = "#70030a"
 
+        inner_notification_bar.pack_forget()
         user_name.pack_forget()
         signup.pack_forget()
         back_to_previous_menu.pack_forget()
@@ -183,7 +184,7 @@ def app_screens(auth_method:str):
 
         login.pack_forget()
         I_dont_have_account.pack_forget()
-
+        
         sleep(0.2)
 
         user_name.pack(pady=3)
@@ -194,7 +195,7 @@ def app_screens(auth_method:str):
     
         email.pack_forget()
         password.pack_forget()        
-
+        inner_notification_bar.pack_forget()
         login.pack_forget()
         I_dont_have_account.pack_forget()
 
@@ -216,6 +217,7 @@ def app_screens(auth_method:str):
         email.pack_forget()
         password.pack_forget()
         I_dont_have_account.pack_forget()
+        inner_notification_bar.pack_forget()
 
         signed_as_user_name_shown_on_screen.pack(pady=40)
 
@@ -226,9 +228,10 @@ def app_screens(auth_method:str):
 
         back_to_previous_menu.pack()
     
-    elif auth_method == "NEW_AC_ERROR" :
+    elif auth_method == "NEW_AC_ERROR" : #---------screen-if-new-account-credencials-not-cool
         inner_notification_bar.pack(side="bottom",fill="x")
-        inner_notification_bar['text'] = "Password cannot be empty !"
+        inner_notification_bar['text'] = 'Account already exists with this email" !'
+        app_screens('SIGNUP')
         inner_notification_bar.after(5000,inner_notification_bar.destroy)
     else:
         read_existing_login_from_local()
