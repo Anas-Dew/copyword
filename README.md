@@ -6,7 +6,18 @@ Have you ever struggled when you have to copy some text from your phone to deskt
 
 > ### Cross-platform -> Desktop to desktop (alpha), Desktop with phone(under-development)
 
-## Currently in-development ☕
+## Screenshots 📸
 
 
+![alt text](https://github.com/Anas-Dew/copyword/blob/main/images/login-screen.png "Login")
+------------------------------------------------->Login Screen   
 
+![alt text](https://github.com/Anas-Dew/copyword/blob/main/images/logged-in-screen.png "Loggedin")
+------------------------------------------------->Logged-in Screen
+
+![alt text](https://github.com/Anas-Dew/copyword/blob/main/images/signup-screen.png "Signup")
+------------------------------------------------->Signup Screen
+
+## What is happening now ? 
+
+Fixing some final issues which user may face..
