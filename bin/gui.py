@@ -59,8 +59,8 @@ def read_existing_login_from_local():
             app_screens("LOGOUT")
         
         else :
-            # signed_as_user_name_shown_on_screen.pack()
-            # signed_as_user_name_shown_on_screen['text'] = ':('
+            signed_as_user_name_shown_on_screen.pack()
+            signed_as_user_name_shown_on_screen['text'] = 'Connection Error..!'
             
             status_bar['text'] = "No internet connection !"
             status_bar['bg'] = "#70030a"
@@ -133,7 +133,7 @@ def create_my_account():
         }
 
         if userbase.find_one({"email" : f"{new_account_schema['email']}"}) or email_is_valid(email.get()) == False : #------account-already-found-error
-            # or password.get() == "" or "Password"
+
             app_screens("NEW_AC_ERROR")
 
         else:
@@ -147,7 +147,7 @@ def create_my_account():
 
     
     except:
-        pass
+        app_screens("ERROR")
 
 
 def log_out_of_account():
@@ -155,7 +155,7 @@ def log_out_of_account():
     app_screens("LOGIN")
 # -------------------------------------------------------all-app-screens-of-application
 
-def app_screens(auth_method:str):
+def app_screens(auth_method : str):
 
     global existed_account_schema
             
@@ -213,13 +213,14 @@ def app_screens(auth_method:str):
 
     elif auth_method == "ERROR" : #---------screen-if-there-is-any-issue
 
+        user_name.pack_forget()
         login.pack_forget()
         email.pack_forget()
         password.pack_forget()
         I_dont_have_account.pack_forget()
         inner_notification_bar.pack_forget()
-
         signed_as_user_name_shown_on_screen.pack(pady=40)
+        signup.pack_forget()
 
         signed_as_user_name_shown_on_screen['text'] = 'Invalid Email or Password !'
         signed_as_user_name_shown_on_screen['fg'] = 'red'
@@ -233,6 +234,7 @@ def app_screens(auth_method:str):
         inner_notification_bar['text'] = 'Account already exists with this email" !'
         app_screens('SIGNUP')
         inner_notification_bar.after(5000,inner_notification_bar.destroy)
+
     else:
         read_existing_login_from_local()
 
@@ -260,5 +262,4 @@ def keeping_the_server_updated(): #----keeping-the-loop-running-so-that-values-g
 
 if __name__ == "__main__":
     read_existing_login_from_local()
-
     root.mainloop()

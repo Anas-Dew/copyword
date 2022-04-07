@@ -22,8 +22,10 @@ def email_is_valid(email):
         return False
 # --------------for-checking-if-internet-is-active-machine
 import requests
+
 url = "https://www.google.com"
 timeout = 10
+
 def connection_status_on_machine():
     try:
         # requesting URL
