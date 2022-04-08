@@ -4,7 +4,7 @@ Have you ever struggled when you have to copy some text from your phone to deskt
 
 > ### It easily syncs across devices (no matter how many devices you have. You just have to setup that device with your account)
 
-> ### Cross-platform -> Desktop to desktop (alpha), Desktop with phone(under-development)
+> ### Cross-platform -> Desktop to desktop (almost completed [under-testing]) , Desktop with phone (soon)
 
 ## Screenshots 📸
 
