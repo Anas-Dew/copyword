@@ -1,4 +1,4 @@
-# copyword - a tool for clipboard syncing across multiple devices
+# ![alt text](https://github.com/Anas-Dew/copyword/blob/main/bin/copyword3_icon.ico "icon") copyword - a tool for clipboard syncing across multiple devices
 
 Have you ever struggled when you have to copy some text from your phone to desktop or desktop to phone? It's so frustrating, Manually see and type OR any other method so time taking. That's why i'm building this to make life little easy.
 
