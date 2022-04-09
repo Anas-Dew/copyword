@@ -3,7 +3,7 @@ from tkinter import Button, Label, Tk, Entry
 import ast
 import os
 import pymongo
-from verification_client import save_logs_on_system, email_is_valid, connection_status_on_machine
+from verification_client import save_logs_on_system, email_is_valid, connection_status_on_machine, two_step_verification
 import pyperclip as pc
 
 
@@ -85,6 +85,12 @@ signed_as_user_name_shown_on_screen = Label(root,text=f'Welcome back',bg="#1e1e2
 inner_notification_bar = Label(text="Anas-Dew", bg="Black", fg="White", font="sans 9")
 # ---------------------
 
+# first_value = Label(root, text=two_step_verification.first_value_of_equation)
+# second_value = Label(root, text=two_step_verification.second_value_of_equation)
+# operator = Label(root, text=two_step_verification.random_operator)
+# answer = Label(root, text=two_step_verification.answer_key)
+#---------------------------------------
+
 user_name = Entry(root, width=30, bg="#383838", fg="White")
 user_name.insert(0, 'Name')
 
@@ -134,17 +140,22 @@ def create_my_account():
 
         if userbase.find_one({"email" : f"{new_account_schema['email']}"}) or email_is_valid(email.get()) == False : #------account-already-found-error
 
-            app_screens("NEW_AC_ERROR")
+            app_screens("NEW-AC-ERROR")
 
         else:
-                existed_account_schema = new_account_schema
-                
-                userbase.insert_one(existed_account_schema)
-                save_logs_on_system(existed_account_schema)
-                keeping_the_server_updated()
-                
-                app_screens("LOGOUT")
+                # if app_screens("2-STEP-VERIFICATION") == True :
 
+
+                    existed_account_schema = new_account_schema
+                    
+                    userbase.insert_one(existed_account_schema)
+                    save_logs_on_system(existed_account_schema)
+                    keeping_the_server_updated()
+                    
+                    app_screens("LOGOUT")
+                # # else :
+                #     inner_notification_bar.pack(side="bottom",fill="x")
+                #     inner_notification_bar['text'] = "Human Capcha failed!"
     
     except:
         app_screens("ERROR")
@@ -191,6 +202,20 @@ def app_screens(auth_method : str):
         signup.pack(padx=2, pady=7)
         back_to_previous_menu.pack()
 
+
+    elif auth_method == "2-STEP-VERIFICATION" :
+
+        email.pack_forget()
+        user_name.pack_forget()
+        password.pack_forget()
+        signup.pack_forget()
+
+        # first_value.pack()
+        # second_value.pack()
+        # operator.pack()
+
+
+
     elif auth_method == "LOGOUT" : #---------screen-after-account-has-logged-in
     
         email.pack_forget()
@@ -229,7 +254,7 @@ def app_screens(auth_method : str):
 
         back_to_previous_menu.pack()
     
-    elif auth_method == "NEW_AC_ERROR" : #---------screen-if-new-account-credencials-not-cool
+    elif auth_method == "NEW-AC-ERROR" : #---------screen-if-new-account-credencials-not-cool
         inner_notification_bar.pack(side="bottom",fill="x")
         inner_notification_bar['text'] = 'Account already exists with this email" !'
         app_screens('SIGNUP')

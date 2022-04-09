@@ -35,3 +35,30 @@ def connection_status_on_machine():
     # catching exception
     except (requests.ConnectionError, requests.Timeout) as exception:
         return False
+
+# -------------2-step-verification
+import random
+import operator
+
+equation_functions = ["+","-","*","/"]
+
+operatorlookup = {
+    '+': operator.add,
+    '-': operator.sub,
+    '*': operator.mul,
+    '/': operator.truediv
+}
+
+def two_step_verification():
+
+    first_value_of_equation = random.randint(-100,100)
+    second_value_of_equation = random.randint(-100,100)
+        
+    random_operator = random.choice(equation_functions)
+    solve_the_value = operatorlookup.get(random_operator)
+
+    answer_key = solve_the_value(first_value_of_equation,second_value_of_equation)
+
+    return first_value_of_equation, random_operator, second_value_of_equation, answer_key
+
+
