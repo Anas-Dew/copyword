@@ -3,7 +3,7 @@ from tkinter import Button, Label, Tk, Entry
 import ast
 import os
 import pymongo
-from verification_client import save_logs_on_system, email_is_valid, connection_status_on_machine, two_step_verification
+from verification_client import save_logs_on_system, email_is_valid, connection_status_on_machine
 import pyperclip as pc
 
 
@@ -72,7 +72,6 @@ def read_existing_login_from_local():
 
 # ------------------------------------------------------------buttons-of-each-application
 
-
 logout_button = Button(root, text="Logout", width=25, height=1,command=lambda: log_out_of_account(), activeforeground="white", activebackground="#383838")
 I_dont_have_account = Button(root, text="I don't have account", width=25, height=1,command=lambda: app_screens("SIGNUP"), activeforeground="white", activebackground="#383838")
     
@@ -84,8 +83,6 @@ back_to_previous_menu = Button(root,command=lambda: app_screens("LOGIN"), text="
 signed_as_user_name_shown_on_screen = Label(root,text=f'Welcome back',bg="#1e1e21",fg="White",font="sans 14")
 inner_notification_bar = Label(text="Anas-Dew", bg="Black", fg="White", font="sans 9")
 # ---------------------
-
-#---------------------------------------
 
 user_name = Entry(root, width=30, bg="#383838", fg="White")
 user_name.insert(0, 'Name')
@@ -138,8 +135,7 @@ def create_my_account():
 
             app_screens("NEW-AC-ERROR")
 
-        else:
-            
+        else:            
                     existed_account_schema = new_account_schema
                     
                     userbase.insert_one(existed_account_schema)
@@ -151,7 +147,6 @@ def create_my_account():
     
     except:
         app_screens("ERROR")
-
 
 def log_out_of_account():
     os.remove("user_login.file")
