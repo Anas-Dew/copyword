@@ -9,7 +9,7 @@
 <h1 align="center">(¯`·.¸¸.·´¯`·.¸¸.-> 匚ㄖ卩ㄚ山ㄖ尺ᗪ <-.¸¸.·´¯`·.¸¸.·´¯)</h1>
 
 <p align="center">
-  Cipboard syncing across unlimited devices
+  Clipboard syncing across unlimited devices
 </p>
 
 <p align="center">
