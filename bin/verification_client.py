@@ -14,7 +14,7 @@ import re
   
 basic_email_structure = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'  
   
-def email_is_valid(email):   
+def email_is_valid(email : str):   
   
     if(re.search(basic_email_structure,email)):   
         return True   

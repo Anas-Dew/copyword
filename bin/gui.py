@@ -1,12 +1,11 @@
 from time import sleep
-from tkinter import Button, Label, Tk, Entry
+from tkinter import Button, Label, Text, Tk, Entry, Menu, messagebox
 import ast
 import os
 import pymongo
 from verification_client import save_logs_on_system, email_is_valid, connection_status_on_machine
 import pyperclip as pc
-
-
+import webbrowser
 # -------------------------------------some-importrant-variables-and-bases-to-run-application
 os.chdir(f"{os.getcwd()}\\copyword\\bin")
 
@@ -14,6 +13,7 @@ DBClient = pymongo.MongoClient("mongodb://localhost:27017")
 
 DB = DBClient['copyword']
 userbase = DB['userbase']
+feedback_base = DB['feedback_base']
 
 existed_account_schema = ""
 
@@ -29,7 +29,7 @@ main_header_title = Label(root,text="CopyWord PC Client",bg="#1e1e21",fg="White"
 status_bar = Label(text="Anas-Dew", bg="Black", fg="White", font="sans 9")
 status_bar.pack(side="bottom",fill="x")
 
-
+menubar = Menu(root)
 # -------------------------------------------------------------app-initialization-function
 def read_existing_login_from_local():
     status_bar['text'] = "Loading..."
@@ -77,8 +77,8 @@ I_dont_have_account = Button(root, text="I don't have account", width=25, height
     
 login = Button(root, text="Login", width=25, height=1,command=lambda: user_login(), activeforeground="white", activebackground="#383838")
 signup = Button(root, text="Create New Account", width=25, height=1,command=lambda: create_my_account(), activeforeground="white", activebackground="#383838")
-back_to_previous_menu = Button(root,command=lambda: app_screens("LOGIN"), text="Back", width=25, height=1, activeforeground="white", activebackground="#383838")
-
+back_to_previous_menu = Button(root,command=lambda: back_to_previous_menu_with(), text="Back", width=25, height=1, activeforeground="white", activebackground="#383838")
+submit_here = Button(root, text="Submit", width=25, height=1,command=lambda: post_feedback(), activeforeground="white", activebackground="#383838")
 # ---------------------
 signed_as_user_name_shown_on_screen = Label(root,text=f'Welcome back',bg="#1e1e21",fg="White",font="sans 14")
 inner_notification_bar = Label(text="Anas-Dew", bg="Black", fg="White", font="sans 9")
@@ -93,6 +93,19 @@ email.insert(0, 'Email')
 password = Entry(root, width=30, bg="#383838", fg="White")
 password.insert(0, 'Password')
 
+feedback_message = Text(root, width=22, height=5, bg="#383838", fg="White")
+
+# -------------------------------------------------------------menu-functions
+file = Menu(menubar, tearoff=0)
+menubar.add_cascade(label='Options', menu=file)
+
+file.add_command(label='Download Update', command=lambda: webbrowser.open_new(
+        r"https://github.com/Anas-Dew/copyword"))
+
+file.add_command(label='Feedback', command=lambda: app_screens("FEEDBACK"))
+
+
+root.config(menu=menubar)
 # ----------------------------------------------------------------logic-functions
 
 def user_login():
@@ -133,7 +146,7 @@ def create_my_account():
 
         if userbase.find_one({"email" : f"{new_account_schema['email']}"}) or email_is_valid(email.get()) == False : #------account-already-found-error
 
-            app_screens("NEW-AC-ERROR")
+            app_screens("NEW-AC-ERROR", 'Invalid Email or Password" !')
 
         else:            
                     existed_account_schema = new_account_schema
@@ -148,12 +161,38 @@ def create_my_account():
     except:
         app_screens("ERROR")
 
+
 def log_out_of_account():
     os.remove("user_login.file")
     app_screens("LOGIN")
+
+
+def post_feedback():
+    feedback_message_schema = {
+        "email" : email.get(),
+        "feedback" : feedback_message.get(1.0, "end-1c")
+    }
+    if email_is_valid(email.get()) == False :
+            
+        feedback_base.insert_one(feedback_message_schema)
+        messagebox.showinfo("Feedback", "Feedback has been recorded")
+
+    else :
+        messagebox.showerror("Feedback", "Email is invalid")
+
+def back_to_previous_menu_with() :
+
+    if existed_account_schema:
+
+        app_screens("LOGOUT")
+
+    else :
+
+        app_screens("LOGIN")
+
 # -------------------------------------------------------all-app-screens-of-application
 
-def app_screens(auth_method : str):
+def app_screens(auth_method : str, notification_text : str = None):
 
     global existed_account_schema
             
@@ -167,9 +206,10 @@ def app_screens(auth_method : str):
         user_name.pack_forget()
         signup.pack_forget()
         back_to_previous_menu.pack_forget()
-
+        feedback_message.pack_forget()
         signed_as_user_name_shown_on_screen.pack_forget()
         logout_button.pack_forget()
+        submit_here.pack_forget()
 
         email.pack(pady=3)
         password.pack(pady=3)
@@ -182,11 +222,13 @@ def app_screens(auth_method : str):
 
         login.pack_forget()
         I_dont_have_account.pack_forget()
-        
+        feedback_message.pack_forget()
+        submit_here.pack_forget()
         sleep(0.2)
 
         user_name.pack(pady=3)
         signup.pack(padx=2, pady=7)
+        
         back_to_previous_menu.pack()
 
 
@@ -197,10 +239,11 @@ def app_screens(auth_method : str):
         inner_notification_bar.pack_forget()
         login.pack_forget()
         I_dont_have_account.pack_forget()
-
+        feedback_message.pack_forget()
         user_name.pack_forget()
         signup.pack_forget()
         back_to_previous_menu.pack_forget()
+        submit_here.pack_forget()
 
         signed_as_user_name_shown_on_screen.pack(pady=10)
         logout_button.pack(padx=2, pady=7)
@@ -211,7 +254,7 @@ def app_screens(auth_method : str):
         signed_as_user_name_shown_on_screen['fg'] = 'white'
 
     elif auth_method == "ERROR" : #---------screen-if-there-is-any-issue
-
+        feedback_message.pack_forget()
         user_name.pack_forget()
         login.pack_forget()
         email.pack_forget()
@@ -220,6 +263,7 @@ def app_screens(auth_method : str):
         inner_notification_bar.pack_forget()
         signed_as_user_name_shown_on_screen.pack(pady=40)
         signup.pack_forget()
+        submit_here.pack_forget()
 
         signed_as_user_name_shown_on_screen['text'] = 'Invalid Email or Password ! '
         signed_as_user_name_shown_on_screen['fg'] = 'red'
@@ -230,9 +274,30 @@ def app_screens(auth_method : str):
     
     elif auth_method == "NEW-AC-ERROR" : #---------screen-if-new-account-credencials-not-cool
         inner_notification_bar.pack(side="bottom",fill="x")
-        inner_notification_bar['text'] = 'Invalid Email or Password" !'
+        inner_notification_bar['text'] = notification_text
         app_screens('SIGNUP')
         inner_notification_bar.after(5000,inner_notification_bar.destroy)
+
+    elif auth_method == "FEEDBACK" : #----------feebback-screen
+        password.pack_forget()
+        user_name.pack_forget()
+        signup.pack_forget()
+        I_dont_have_account.pack_forget()
+        login.pack_forget()
+        logout_button.pack_forget()
+        signed_as_user_name_shown_on_screen.pack_forget()
+        back_to_previous_menu.pack_forget()
+        email.pack()
+               
+        if existed_account_schema:
+            email.delete(0,"end")
+            email.insert(0, f"{existed_account_schema['email']}")
+
+        email.pack()
+        feedback_message.pack()
+        submit_here.pack()
+        back_to_previous_menu.pack()
+
 
     else:
         read_existing_login_from_local()
@@ -257,7 +322,6 @@ def keeping_the_server_updated(): #----keeping-the-loop-running-so-that-values-g
         root.after(1234,keeping_the_server_updated) #1234-is-in-mili-seconds
 
 # -------------------------main-function
-
 
 if __name__ == "__main__":
     read_existing_login_from_local()
