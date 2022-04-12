@@ -34,8 +34,15 @@
 
 <p align="center">
   <img src="https://github.com/Anas-Dew/copyword/blob/main/images/login-screen.png">
+  <br>
   <img src="https://github.com/Anas-Dew/copyword/blob/main/images/logged-in-screen.png">
+  <br>
   <img src="https://github.com/Anas-Dew/copyword/blob/main/images/signup-screen.png">
+  <br>
+  <img src="https://github.com/Anas-Dew/copyword/blob/main/images/new-options.png">
+  <br>
+  <img src="https://github.com/Anas-Dew/copyword/blob/main/images/feedback-screen.png">
+  
 </p>
  
   
