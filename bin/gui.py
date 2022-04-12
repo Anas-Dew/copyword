@@ -163,7 +163,9 @@ def create_my_account():
 
 
 def log_out_of_account():
+    global existed_account_schema
     os.remove("user_login.file")
+    existed_account_schema = ""
     app_screens("LOGIN")
 
 
@@ -172,7 +174,7 @@ def post_feedback():
         "email" : email.get(),
         "feedback" : feedback_message.get(1.0, "end-1c")
     }
-    if email_is_valid(email.get()) == False :
+    if email_is_valid(email.get()) == True :
             
         feedback_base.insert_one(feedback_message_schema)
         messagebox.showinfo("Feedback", "Feedback has been recorded")
@@ -182,13 +184,13 @@ def post_feedback():
 
 def back_to_previous_menu_with() :
 
-    if existed_account_schema:
+    if existed_account_schema == "":
 
-        app_screens("LOGOUT")
+        app_screens("LOGIN")
 
     else :
 
-        app_screens("LOGIN")
+        app_screens("LOGOUT")
 
 # -------------------------------------------------------all-app-screens-of-application
 
