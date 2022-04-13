@@ -166,7 +166,9 @@ def log_out_of_account():
     global existed_account_schema
     os.remove("user_login.file")
     existed_account_schema = ""
+    
     app_screens("LOGIN")
+
 
 
 def post_feedback():
@@ -305,18 +307,24 @@ def app_screens(auth_method : str, notification_text : str = None):
         read_existing_login_from_local()
 
 # --------------------------------------------------------------mongodb-server-functions
+
+def reading_new_clipboard_from_server(): #----reading-letest-value-from-server-if-it-comes-from-another-linked-device
+    if TypeError:
+        return None
+    else :
+        new_clipboard_object = userbase.find_one({"email" : existed_account_schema["email"]})['clipboard']
+        pc.copy(new_clipboard_object)
+
 def create_and_update_new_word_instance_on_server(): #----main-server-driver
 
     new_copied_object = {"clipboard" : f"{pc.paste()}"}
-
-    userbase.find_one_and_update({"email" : existed_account_schema["email"]},{"$set" : new_copied_object})
-    reading_new_clipboard_from_server()
-   
+    if TypeError:
+        return None
+    else :
+        userbase.find_one_and_update({"email" : existed_account_schema["email"]},{"$set" : new_copied_object})
+        reading_new_clipboard_from_server()
     
-def reading_new_clipboard_from_server(): #----reading-letest-value-from-server-if-it-comes-from-another-linked-device
-
-    new_clipboard_object = userbase.find_one({"email" : existed_account_schema["email"]})['clipboard']
-    pc.copy(new_clipboard_object)
+    
 
 def keeping_the_server_updated(): #----keeping-the-loop-running-so-that-values-got-updated-in-secs
     
