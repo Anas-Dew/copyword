@@ -9,7 +9,9 @@ import webbrowser
 # -------------------------------------some-importrant-variables-and-bases-to-run-application
 os.chdir(f"{os.getcwd()}\\copyword\\bin")
 
-DBClient = pymongo.MongoClient("mongodb://localhost:27017")
+# DBClient = pymongo.MongoClient("mongodb://localhost:27017")
+DBClient = pymongo.MongoClient("mongodb://public_user:me0IUpVVaY1PmvWV@copywordbase-shard-00-00.pya1y.mongodb.net:27017,copywordbase-shard-00-01.pya1y.mongodb.net:27017,copywordbase-shard-00-02.pya1y.mongodb.net:27017/test?replicaSet=atlas-dlvpl1-shard-0&ssl=true&authSource=admin")
+
 
 DB = DBClient['copyword']
 userbase = DB['userbase']
@@ -61,7 +63,7 @@ def read_existing_login_from_local():
         else :
             signed_as_user_name_shown_on_screen.pack()
             signed_as_user_name_shown_on_screen['text'] = 'Connection Error..!'
-            
+            messagebox.showerror("Connection Error", "PC isnot connected to internet")
             status_bar['text'] = "No internet connection !"
             status_bar['bg'] = "#70030a"
 
@@ -102,8 +104,7 @@ menubar.add_cascade(label='Options', menu=file)
 file.add_command(label='Download Update', command=lambda: webbrowser.open_new(
         r"https://github.com/Anas-Dew/copyword"))
 
-file.add_command(label='Feedback', command=lambda: app_screens("FEEDBACK"))
-
+file.add_command(label='Feedback', command=lambda: messagebox.showerror("Connection Error", "PC isnot connected to internet")  if connection_status_on_machine() == False else app_screens("FEEDBACK"))
 
 root.config(menu=menubar)
 # ----------------------------------------------------------------logic-functions
@@ -172,26 +173,34 @@ def log_out_of_account():
 
 
 def post_feedback():
+
     feedback_message_schema = {
         "email" : email.get(),
         "feedback" : feedback_message.get(1.0, "end-1c")
     }
-    if email_is_valid(email.get()) == True :
+
+    if email_is_valid(email.get()) == True and connection_status_on_machine() == True:
             
         feedback_base.insert_one(feedback_message_schema)
         messagebox.showinfo("Feedback", "Feedback has been recorded")
 
+    elif connection_status_on_machine() == False :
+
+        app_screens("NEW-AC-ERROR","PC isnot connected to internet")
+
     else :
+
         messagebox.showerror("Feedback", "Email is invalid")
+
+            
 
 def back_to_previous_menu_with() :
 
-    if existed_account_schema == "":
+    if existed_account_schema == "" and connection_status_on_machine() == True:
 
         app_screens("LOGIN")
-
+    
     else :
-
         app_screens("LOGOUT")
 
 # -------------------------------------------------------all-app-screens-of-application
@@ -268,13 +277,12 @@ def app_screens(auth_method : str, notification_text : str = None):
         signed_as_user_name_shown_on_screen.pack(pady=40)
         signup.pack_forget()
         submit_here.pack_forget()
+        logout_button.pack_forget()
+        back_to_previous_menu.pack_forget()
+        status_bar.pack_forget()
 
-        signed_as_user_name_shown_on_screen['text'] = 'Invalid Email or Password ! '
-        signed_as_user_name_shown_on_screen['fg'] = 'red'
-        status_bar['text'] = "Try Again.."
-        status_bar['bg'] = "#70030a"
 
-        back_to_previous_menu.pack()
+        signed_as_user_name_shown_on_screen['text'] = notification_text
     
     elif auth_method == "NEW-AC-ERROR" : #---------screen-if-new-account-credencials-not-cool
         inner_notification_bar.pack(side="bottom",fill="x")
@@ -309,27 +317,30 @@ def app_screens(auth_method : str, notification_text : str = None):
 # --------------------------------------------------------------mongodb-server-functions
 
 def reading_new_clipboard_from_server(): #----reading-letest-value-from-server-if-it-comes-from-another-linked-device
-    if TypeError:
-        return None
-    else :
+    # if TypeError:
+    #     return None
+    # else :
         new_clipboard_object = userbase.find_one({"email" : existed_account_schema["email"]})['clipboard']
         pc.copy(new_clipboard_object)
 
 def create_and_update_new_word_instance_on_server(): #----main-server-driver
 
-    new_copied_object = {"clipboard" : f"{pc.paste()}"}
-    if TypeError:
-        return None
-    else :
+   
+    # if TypeError:
+    #     return None
+    # else :
+        new_copied_object = {"clipboard" : f"{pc.paste()}"}
         userbase.find_one_and_update({"email" : existed_account_schema["email"]},{"$set" : new_copied_object})
         reading_new_clipboard_from_server()
     
     
-
 def keeping_the_server_updated(): #----keeping-the-loop-running-so-that-values-got-updated-in-secs
-    
-        create_and_update_new_word_instance_on_server()    
-        root.after(1234,keeping_the_server_updated) #1234-is-in-mili-seconds
+        if connection_status_on_machine() == True :
+
+            create_and_update_new_word_instance_on_server()    
+            root.after(1234,keeping_the_server_updated) #1234-is-in-mili-seconds
+        else :
+            app_screens("ERROR", "PC isnot connected to internet")
 
 # -------------------------main-function
 
