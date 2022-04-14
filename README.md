@@ -44,8 +44,12 @@
   <img src="https://github.com/Anas-Dew/copyword/blob/main/images/feedback-screen.png">
   
 </p>
- 
+
   
+# Download Letest Update
+  <p align="center">
+  <a href="https://github.com/Anas-Dew/copyword#readme" target="_blank" >Click Me To Download</a>
+  </p>
   
   
 Feel free to contribute 🎁, Thank you 💝
