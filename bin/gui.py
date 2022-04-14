@@ -9,8 +9,7 @@ import webbrowser
 # -------------------------------------some-importrant-variables-and-bases-to-run-application
 os.chdir(f"{os.getcwd()}\\copyword\\bin")
 
-# DBClient = pymongo.MongoClient("mongodb://localhost:27017")
-DBClient = pymongo.MongoClient("mongodb://public_user:me0IUpVVaY1PmvWV@copywordbase-shard-00-00.pya1y.mongodb.net:27017,copywordbase-shard-00-01.pya1y.mongodb.net:27017,copywordbase-shard-00-02.pya1y.mongodb.net:27017/test?replicaSet=atlas-dlvpl1-shard-0&ssl=true&authSource=admin")
+DBClient = pymongo.MongoClient("mongodb://localhost:27017")
 
 
 DB = DBClient['copyword']
@@ -55,6 +54,7 @@ def read_existing_login_from_local():
             
             
             status_bar['text'] = "Login Succees"
+            status_bar['fg'] = "#ffffff"
             status_bar['bg'] = "#03700c"
             
             keeping_the_server_updated()
@@ -65,10 +65,12 @@ def read_existing_login_from_local():
             signed_as_user_name_shown_on_screen['text'] = 'Connection Error..!'
             messagebox.showerror("Connection Error", "PC isnot connected to internet")
             status_bar['text'] = "No internet connection !"
+            status_bar['fg'] = "#ffffff"
             status_bar['bg'] = "#70030a"
 
     except:
         status_bar['text'] = "You're logged out !!!"
+        status_bar['fg'] = "#ffffff"
         status_bar['bg'] = "#70030a"
         app_screens("LOGIN")
 
@@ -128,10 +130,12 @@ def user_login():
             app_screens("LOGOUT")
 
         else:
-            app_screens("ERROR")
+            app_screens("ERROR", "Invalid Email or Password")
+            back_to_previous_menu.pack()
 
     except:
-        app_screens("ERROR")
+        app_screens("ERROR" , "Invalid Email or Password")
+        back_to_previous_menu.pack()
         
 # ------------
 
@@ -160,8 +164,8 @@ def create_my_account():
                 
     
     except:
-        app_screens("ERROR")
-
+        app_screens("ERROR","Error..!")
+        back_to_previous_menu.pack()
 
 def log_out_of_account():
     global existed_account_schema
@@ -186,7 +190,7 @@ def post_feedback():
 
     elif connection_status_on_machine() == False :
 
-        app_screens("NEW-AC-ERROR","PC isnot connected to internet")
+        app_screens("ERROR","PC isnot connected to internet")
 
     else :
 
@@ -195,16 +199,20 @@ def post_feedback():
             
 
 def back_to_previous_menu_with() :
+    login_creds = {"email" : f"{email.get()}"}
 
     if existed_account_schema == "" and connection_status_on_machine() == True:
 
         app_screens("LOGIN")
     
-    else :
+    elif existed_account_schema['password'] == userbase.find_one(login_creds)['password'] :
+
         app_screens("LOGOUT")
+    
+    else :
+        app_screens("LOGIN")
 
 # -------------------------------------------------------all-app-screens-of-application
-
 def app_screens(auth_method : str, notification_text : str = None):
 
     global existed_account_schema
@@ -213,6 +221,7 @@ def app_screens(auth_method : str, notification_text : str = None):
     if auth_method == "LOGIN" : #---------login-screen
 
         status_bar['text'] = "You're logged out !!!"
+        status_bar['fg'] = "#ffffff"
         status_bar['bg'] = "#70030a"
 
         inner_notification_bar.pack_forget()
@@ -262,6 +271,7 @@ def app_screens(auth_method : str, notification_text : str = None):
         logout_button.pack(padx=2, pady=7)
 
         status_bar['text'] = "Login Succees"
+        status_bar['fg'] = "#ffffff"
         status_bar['bg'] = "#03700c"
         signed_as_user_name_shown_on_screen['text'] = f'Welcome, {(list(existed_account_schema["name"]))[0]}'
         signed_as_user_name_shown_on_screen['fg'] = 'white'
@@ -279,7 +289,10 @@ def app_screens(auth_method : str, notification_text : str = None):
         submit_here.pack_forget()
         logout_button.pack_forget()
         back_to_previous_menu.pack_forget()
-        status_bar.pack_forget()
+        
+        status_bar['text'] = "Error Found..!"
+        status_bar['fg'] = "#000000"
+        status_bar['bg'] = "#f8fc03"
 
 
         signed_as_user_name_shown_on_screen['text'] = notification_text
@@ -287,7 +300,7 @@ def app_screens(auth_method : str, notification_text : str = None):
     elif auth_method == "NEW-AC-ERROR" : #---------screen-if-new-account-credencials-not-cool
         inner_notification_bar.pack(side="bottom",fill="x")
         inner_notification_bar['text'] = notification_text
-        app_screens('SIGNUP')
+        app_screens('LOGIN')
         inner_notification_bar.after(5000,inner_notification_bar.destroy)
 
     elif auth_method == "FEEDBACK" : #----------feebback-screen

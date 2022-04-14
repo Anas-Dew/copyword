@@ -36,3 +36,4 @@ def connection_status_on_machine():
     except (requests.ConnectionError, requests.Timeout) as exception:
         return False
 
+
