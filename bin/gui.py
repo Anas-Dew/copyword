@@ -11,7 +11,6 @@ os.chdir(f"{os.getcwd()}\\copyword\\bin")
 
 DBClient = pymongo.MongoClient("mongodb://localhost:27017")
 
-
 DB = DBClient['copyword']
 userbase = DB['userbase']
 feedback_base = DB['feedback_base']
@@ -104,7 +103,7 @@ file = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='Options', menu=file)
 
 file.add_command(label='Download Update', command=lambda: webbrowser.open_new(
-        r"https://github.com/Anas-Dew/copyword"))
+        r"https://github.com/Anas-Dew/copyword#download-letest-update"))
 
 file.add_command(label='Feedback', command=lambda: messagebox.showerror("Connection Error", "PC isnot connected to internet")  if connection_status_on_machine() == False else app_screens("FEEDBACK"))
 
@@ -134,7 +133,7 @@ def user_login():
             back_to_previous_menu.pack()
 
     except:
-        app_screens("ERROR" , "Invalid Email or Password")
+        app_screens("ERROR" , "Please Email or Password")
         back_to_previous_menu.pack()
         
 # ------------
@@ -296,12 +295,12 @@ def app_screens(auth_method : str, notification_text : str = None):
 
 
         signed_as_user_name_shown_on_screen['text'] = notification_text
-    
+
     elif auth_method == "NEW-AC-ERROR" : #---------screen-if-new-account-credencials-not-cool
         inner_notification_bar.pack(side="bottom",fill="x")
         inner_notification_bar['text'] = notification_text
-        app_screens('LOGIN')
         inner_notification_bar.after(5000,inner_notification_bar.destroy)
+        app_screens('LOGIN')
 
     elif auth_method == "FEEDBACK" : #----------feebback-screen
         password.pack_forget()
@@ -348,12 +347,10 @@ def create_and_update_new_word_instance_on_server(): #----main-server-driver
     
     
 def keeping_the_server_updated(): #----keeping-the-loop-running-so-that-values-got-updated-in-secs
-        if connection_status_on_machine() == True :
-
+        
             create_and_update_new_word_instance_on_server()    
-            root.after(1234,keeping_the_server_updated) #1234-is-in-mili-seconds
-        else :
-            app_screens("ERROR", "PC isnot connected to internet")
+            root.after(2000,keeping_the_server_updated) #1234-is-in-mili-seconds
+        
 
 # -------------------------main-function
 
