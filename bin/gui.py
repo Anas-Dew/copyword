@@ -6,6 +6,8 @@ import pymongo
 from verification_client import save_logs_on_system, email_is_valid, connection_status_on_machine
 import pyperclip as pc
 import webbrowser
+import socket
+
 # -------------------------------------some-importrant-variables-and-bases-to-run-application
 os.chdir(f"{os.getcwd()}\\copyword\\bin")
 
@@ -82,13 +84,15 @@ login = Button(root, text="Login", width=25, height=1,command=lambda: user_login
 signup = Button(root, text="Create New Account", width=25, height=1,command=lambda: create_my_account(), activeforeground="white", activebackground="#383838")
 back_to_previous_menu = Button(root,command=lambda: back_to_previous_menu_with(), text="Back", width=25, height=1, activeforeground="white", activebackground="#383838")
 submit_here = Button(root, text="Submit", width=25, height=1,command=lambda: post_feedback(), activeforeground="white", activebackground="#383838")
+
+
 # ---------------------
 signed_as_user_name_shown_on_screen = Label(root,text=f'Welcome back',bg="#1e1e21",fg="White",font="sans 14")
 inner_notification_bar = Label(text="Anas-Dew", bg="Black", fg="White", font="sans 9")
 # ---------------------
 
 user_name = Entry(root, width=30, bg="#383838", fg="White")
-user_name.insert(0, 'Name')
+user_name.insert(0, 'Your Name')
 
 email = Entry(root, width=30, bg="#383838", fg="White")
 email.insert(0, 'Email')
@@ -111,6 +115,7 @@ root.config(menu=menubar)
 # ----------------------------------------------------------------logic-functions
 
 def user_login():
+
     global existed_account_schema
     try:
         
@@ -143,6 +148,7 @@ def create_my_account():
 
     try:
         new_account_schema = {
+            "device_name": socket.gethostname(),
             "email" : email.get(),
             "name" : user_name.get(),
             "password" : password.get()
@@ -152,11 +158,12 @@ def create_my_account():
 
             app_screens("NEW-AC-ERROR", 'Invalid Email or Password" !')
 
-        else:            
+        else:           
+
                     existed_account_schema = new_account_schema
                     
-                    userbase.insert_one(existed_account_schema)
-                    save_logs_on_system(existed_account_schema)
+                    userbase.insert_one(new_account_schema)
+                    save_logs_on_system(new_account_schema)
                     keeping_the_server_updated()
                     
                     app_screens("LOGOUT")
@@ -167,6 +174,7 @@ def create_my_account():
         back_to_previous_menu.pack()
 
 def log_out_of_account():
+
     global existed_account_schema
     os.remove("user_login.file")
     existed_account_schema = ""
@@ -188,26 +196,20 @@ def post_feedback():
         messagebox.showinfo("Feedback", "Feedback has been recorded")
 
     elif connection_status_on_machine() == False :
-
         app_screens("ERROR","PC isnot connected to internet")
-
     else :
-
         messagebox.showerror("Feedback", "Email is invalid")
 
             
 
 def back_to_previous_menu_with() :
+
     login_creds = {"email" : f"{email.get()}"}
 
     if existed_account_schema == "" and connection_status_on_machine() == True:
-
         app_screens("LOGIN")
-    
     elif existed_account_schema['password'] == userbase.find_one(login_creds)['password'] :
-
         app_screens("LOGOUT")
-    
     else :
         app_screens("LOGIN")
 
@@ -245,16 +247,17 @@ def app_screens(auth_method : str, notification_text : str = None):
         I_dont_have_account.pack_forget()
         feedback_message.pack_forget()
         submit_here.pack_forget()
-        sleep(0.2)
 
         user_name.pack(pady=3)
+       
+
         signup.pack(padx=2, pady=7)
-        
         back_to_previous_menu.pack()
 
 
     elif auth_method == "LOGOUT" : #---------screen-after-account-has-logged-in
-    
+        
+        
         email.pack_forget()
         password.pack_forget()        
         inner_notification_bar.pack_forget()
@@ -275,11 +278,14 @@ def app_screens(auth_method : str, notification_text : str = None):
         signed_as_user_name_shown_on_screen['text'] = f'Welcome, {(list(existed_account_schema["name"]))[0]}'
         signed_as_user_name_shown_on_screen['fg'] = 'white'
 
+
     elif auth_method == "ERROR" : #---------screen-if-there-is-any-issue
+
         feedback_message.pack_forget()
         user_name.pack_forget()
         login.pack_forget()
         email.pack_forget()
+        
         password.pack_forget()
         I_dont_have_account.pack_forget()
         inner_notification_bar.pack_forget()
@@ -296,11 +302,13 @@ def app_screens(auth_method : str, notification_text : str = None):
 
         signed_as_user_name_shown_on_screen['text'] = notification_text
 
+
     elif auth_method == "NEW-AC-ERROR" : #---------screen-if-new-account-credencials-not-cool
         inner_notification_bar.pack(side="bottom",fill="x")
         inner_notification_bar['text'] = notification_text
         inner_notification_bar.after(5000,inner_notification_bar.destroy)
         app_screens('LOGIN')
+
 
     elif auth_method == "FEEDBACK" : #----------feebback-screen
         password.pack_forget()
@@ -322,6 +330,9 @@ def app_screens(auth_method : str, notification_text : str = None):
         submit_here.pack()
         back_to_previous_menu.pack()
 
+    elif auth_method == "MY-DEVICES" :
+        pass
+        
 
     else:
         read_existing_login_from_local()
@@ -329,18 +340,12 @@ def app_screens(auth_method : str, notification_text : str = None):
 # --------------------------------------------------------------mongodb-server-functions
 
 def reading_new_clipboard_from_server(): #----reading-letest-value-from-server-if-it-comes-from-another-linked-device
-    # if TypeError:
-    #     return None
-    # else :
+ 
         new_clipboard_object = userbase.find_one({"email" : existed_account_schema["email"]})['clipboard']
         pc.copy(new_clipboard_object)
 
 def create_and_update_new_word_instance_on_server(): #----main-server-driver
 
-   
-    # if TypeError:
-    #     return None
-    # else :
         new_copied_object = {"clipboard" : f"{pc.paste()}"}
         userbase.find_one_and_update({"email" : existed_account_schema["email"]},{"$set" : new_copied_object})
         reading_new_clipboard_from_server()
