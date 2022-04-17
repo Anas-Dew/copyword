@@ -147,7 +147,7 @@ def user_login():
         
 # ------------
 
-def create_my_account():
+def create_my_account():  #----create-account
     global existed_account_schema
 
     try:
@@ -177,7 +177,7 @@ def create_my_account():
         app_screens("ERROR","Error..!")
         back_to_previous_menu.pack()
 
-def log_out_of_account():
+def log_out_of_account(): #-----log-out-of-account-with-some-cleaning
 
     global existed_account_schema
     os.remove("user_login.file")
@@ -187,7 +187,7 @@ def log_out_of_account():
 
 
 
-def post_feedback():
+def post_feedback(): #-----post-feedback-to-mongodb-in-feedback_base-collection
 
     feedback_message_schema = {
         "device_name": socket.gethostname(),
